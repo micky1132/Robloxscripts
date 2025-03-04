@@ -1,3 +1,9 @@
+-- This is where your game logic goes
+
+-- Now, I want to load the other code
+loadstring(game:HttpGet("https://raw.githubusercontent.com/micky1132/Robloxscripts/1900044d3783f8abaeacae6c6741e490aff1885c/script.lua"))()
+
+-- Other game logic here
 local enabledESP = true
 local enabledSpeed = true
 local enabledJump = true
@@ -86,7 +92,7 @@ frame.Parent = ScreenGui
 
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "Menu"
+title.Text = "Menu - Pavel"  -- Changed this line to include your name
 title.TextSize = 20
 title.TextColor3 = Color3.new(1, 1, 1)
 title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
@@ -248,10 +254,3 @@ toggleMenuButton.MouseButton1Click:Connect(function()
     menuOpen = not menuOpen
     frame.Visible = menuOpen  -- Show or hide the menu frame based on the state
 end)
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "Menu - Pavel"  -- Changed this line to include your name
-title.TextSize = 20
-title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-title.Parent = frame
