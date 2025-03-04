@@ -1,0 +1,257 @@
+local enabledESP = true
+local enabledSpeed = true
+local enabledJump = true
+local menuSize = "Medium"  -- Default size, can be "Small", "Medium", or "Large"
+
+-- Function to create ESP
+local function createESP(player)
+    local espSquare = Instance.new("Part")
+    espSquare.Size = Vector3.new(4, 6, 4)
+    espSquare.Anchored = true
+    espSquare.CanCollide = false
+    espSquare.Transparency = 0.5
+    espSquare.BrickColor = BrickColor.new("Bright green")
+    espSquare.Parent = game.Workspace
+    espSquare.Position = player.Character:WaitForChild("HumanoidRootPart").Position
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Size = UDim2.new(0, 100, 0, 50)
+    billboard.Adornee = espSquare
+    billboard.Parent = espSquare
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+
+    local label = Instance.new("TextLabel")
+    label.Text = player.Name .. " - Health: " .. math.floor(player.Character:WaitForChild("Humanoid").Health)
+    label.TextSize = 14
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.BackgroundTransparency = 1
+    label.TextScaled = true
+    label.TextAlign = Enum.TextAlign.Center
+    label.Parent = billboard
+
+    player.Character:WaitForChild("Humanoid").HealthChanged:Connect(function()
+        label.Text = player.Name .. " - Health: " .. math.floor(player.Character:WaitForChild("Humanoid").Health)
+    end)
+
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            espSquare.Position = player.Character.HumanoidRootPart.Position
+        end
+    end)
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        createESP(player)
+    end)
+end)
+
+-- Speed Boost
+if enabledSpeed then
+    local function setSpeed(player)
+        local humanoid = player.Character:WaitForChild("Humanoid")
+        humanoid.WalkSpeed = 100
+    end
+
+    game.Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function(character)
+            setSpeed(player)
+        end)
+    end)
+end
+
+-- Jump Boost
+if enabledJump then
+    local function setJumpPower(player)
+        local humanoid = player.Character:WaitForChild("Humanoid")
+        humanoid.JumpPower = 100
+    end
+
+    game.Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function(character)
+            setJumpPower(player)
+        end)
+    end)
+end
+
+-- Create the GUI Menu
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
+ScreenGui.Name = "HackMenu"
+
+local frame = Instance.new("Frame")
+frame.Position = UDim2.new(0, 10, 0, 10)
+frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+frame.Parent = ScreenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "Menu"
+title.TextSize = 20
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+title.Parent = frame
+
+-- Function to set the menu size
+local function setMenuSize()
+    if menuSize == "Small" then
+        frame.Size = UDim2.new(0, 150, 0, 200)
+        for _, button in ipairs(frame:GetChildren()) do
+            if button:IsA("TextButton") then
+                button.Size = UDim2.new(1, 0, 0, 25)
+            end
+        end
+    elseif menuSize == "Medium" then
+        frame.Size = UDim2.new(0, 200, 0, 300)
+        for _, button in ipairs(frame:GetChildren()) do
+            if button:IsA("TextButton") then
+                button.Size = UDim2.new(1, 0, 0, 40)
+            end
+        end
+    elseif menuSize == "Large" then
+        frame.Size = UDim2.new(0, 250, 0, 400)
+        for _, button in ipairs(frame:GetChildren()) do
+            if button:IsA("TextButton") then
+                button.Size = UDim2.new(1, 0, 0, 50)
+            end
+        end
+    end
+end
+
+-- Call the function to apply the default menu size
+setMenuSize()
+
+-- Create the Toggle Buttons
+local espButton = Instance.new("TextButton")
+espButton.Size = UDim2.new(1, 0, 0, 40)
+espButton.Position = UDim2.new(0, 0, 0.1, 0)
+espButton.Text = "Toggle ESP"
+espButton.TextSize = 16
+espButton.TextColor3 = Color3.new(1, 1, 1)
+espButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+espButton.Parent = frame
+
+local speedButton = Instance.new("TextButton")
+speedButton.Size = UDim2.new(1, 0, 0, 40)
+speedButton.Position = UDim2.new(0, 0, 0.3, 0)
+speedButton.Text = "Toggle Speed"
+speedButton.TextSize = 16
+speedButton.TextColor3 = Color3.new(1, 1, 1)
+speedButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+speedButton.Parent = frame
+
+local jumpButton = Instance.new("TextButton")
+jumpButton.Size = UDim2.new(1, 0, 0, 40)
+jumpButton.Position = UDim2.new(0, 0, 0.5, 0)
+jumpButton.Text = "Toggle Jump"
+jumpButton.TextSize = 16
+jumpButton.TextColor3 = Color3.new(1, 1, 1)
+jumpButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+jumpButton.Parent = frame
+
+-- Toggle ESP
+espButton.MouseButton1Click:Connect(function()
+    enabledESP = not enabledESP
+    if enabledESP then
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            createESP(player)
+        end
+    else
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            -- Remove ESP (destroy the ESP squares)
+            local espSquare = game.Workspace:FindFirstChild(player.Name .. "ESP")
+            if espSquare then
+                espSquare:Destroy()
+            end
+        end
+    end
+end)
+
+-- Toggle Speed
+speedButton.MouseButton1Click:Connect(function()
+    enabledSpeed = not enabledSpeed
+    if enabledSpeed then
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            setSpeed(player)
+        end
+    end
+end)
+
+-- Toggle Jump
+jumpButton.MouseButton1Click:Connect(function()
+    enabledJump = not enabledJump
+    if enabledJump then
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            setJumpPower(player)
+        end
+    end
+end)
+
+-- Size Change Buttons
+local smallButton = Instance.new("TextButton")
+smallButton.Size = UDim2.new(1, 0, 0, 40)
+smallButton.Position = UDim2.new(0, 0, 0.7, 0)
+smallButton.Text = "Small"
+smallButton.TextSize = 16
+smallButton.TextColor3 = Color3.new(1, 1, 1)
+smallButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+smallButton.Parent = frame
+
+local mediumButton = Instance.new("TextButton")
+mediumButton.Size = UDim2.new(1, 0, 0, 40)
+mediumButton.Position = UDim2.new(0, 0, 0.8, 0)
+mediumButton.Text = "Medium"
+mediumButton.TextSize = 16
+mediumButton.TextColor3 = Color3.new(1, 1, 1)
+mediumButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+mediumButton.Parent = frame
+
+local largeButton = Instance.new("TextButton")
+largeButton.Size = UDim2.new(1, 0, 0, 40)
+largeButton.Position = UDim2.new(0, 0, 0.9, 0)
+largeButton.Text = "Large"
+largeButton.TextSize = 16
+largeButton.TextColor3 = Color3.new(1, 1, 1)
+largeButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+largeButton.Parent = frame
+
+smallButton.MouseButton1Click:Connect(function()
+    menuSize = "Small"
+    setMenuSize()
+end)
+
+mediumButton.MouseButton1Click:Connect(function()
+    menuSize = "Medium"
+    setMenuSize()
+end)
+
+largeButton.MouseButton1Click:Connect(function()
+    menuSize = "Large"
+    setMenuSize()
+end)
+
+-- Variable to track the menu visibility
+local menuOpen = false
+
+-- Create the Open/Close Menu Button
+local toggleMenuButton = Instance.new("TextButton")
+toggleMenuButton.Size = UDim2.new(0, 100, 0, 50)
+toggleMenuButton.Position = UDim2.new(0, 10, 0, 10)  -- Adjust the position as needed
+toggleMenuButton.Text = "Toggle Menu"
+toggleMenuButton.TextSize = 16
+toggleMenuButton.TextColor3 = Color3.new(1, 1, 1)
+toggleMenuButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+toggleMenuButton.Parent = ScreenGui
+
+-- Function to toggle the menu visibility
+toggleMenuButton.MouseButton1Click:Connect(function()
+    menuOpen = not menuOpen
+    frame.Visible = menuOpen  -- Show or hide the menu frame based on the state
+end)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "Menu - Pavel"  -- Changed this line to include your name
+title.TextSize = 20
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+title.Parent = frame
